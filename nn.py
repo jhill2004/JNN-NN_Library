@@ -14,27 +14,31 @@ class NN:
         for layer in self.layers:
             input_data = layer.forward(input_data)
         return input_data
-    def backward(self, input_data):
-        dypred = -2 * (input_data - self.forward(input_data))
-        multilist = np.array([dypred])
-        for layer in self.layers:
-            pass
-        pass
+    def MSE(self, prediction, target):
+        return (1/prediction.size) * (prediction-target)
+    
+    def backpropagate(self, target):
+      
+        prediction = self.layers[-1].get_values()
+        dloss = prediction - target
+
+    
+        for i in reversed(range(1, len(self.layers))):
+            dloss = self.layers[i].backward(dloss, self.layers[i-1])
+            
+    def update_weights(self, learning_rate):
+        for layer in self.layers[1:]:
+            for node in layer.nodes:
+                for i in range(len(node.weights)):
+                    node.weights[i] -= learning_rate * node.weights[i]
+
+    def train(self, data, target, learning_rate):
+        prediction = self.forward(data)
+        self.backpropagate(target)
+        self.update_weights(learning_rate)
+        return self.compute_loss(prediction, target)
             
             
             
     
 
-
-if __name__ == "__main__":
-    # Initialize a simple NN
-    print("aaaaaaaaa")
-    neural_net = NN()
-    neural_net.add_layer(input_size=3, output_size=5)  # Hidden layer
-    neural_net.add_layer(input_size=5, output_size=1)  # Output layer
-
-    # Test forward pass
-    sample_input = np.array([0.5, 0.6, 0.1])
-    prediction = neural_net.forward(sample_input)
-    print("Prediction:", prediction)
-    

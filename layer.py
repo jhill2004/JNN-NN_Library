@@ -23,4 +23,15 @@ class Layer:
         for i in range(self.output_size):
             output = np.append(output, self.nodes[i].activation(z[i]))
         return output
+    def get_values(self):
+        return np.array([node.value for node in self.nodes])
+    
+    def backward(self, dloss, previous_layer):
+        dloss_prev = np.zeros(previous_layer.size)
+        for index, node in enumerate(self.nodes):
+            error = dloss[index] * node.derive(node.key)
+            for i, weight in enumerate(node.weights):
+                dloss_prev[i] += error*weight
+                weight -= error * previous_layer.nodes[i].value
+        return dloss_prev
             
